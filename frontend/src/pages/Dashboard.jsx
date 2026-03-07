@@ -7,6 +7,7 @@ export default function Dashboard() {
   const [stocks, setStocks] = useState([]);
   const [portfolioValue, setPortfolioValue] = useState(0);
   const [todayChange, setTodayChange] = useState(0);
+  const [activeHoldingsCount, setActiveHoldingsCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -27,22 +28,19 @@ export default function Dashboard() {
       const allStocks = await getAllStocks();
       setStocks(allStocks.slice(0, 10));
 
-      const portfolio = JSON.parse(localStorage.getItem("portfolio") || "[]");
-      let totalValue = 0;
-      let invested = 0;
+      const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
+      if (currentUser && currentUser._id) {
+        const response = await fetch(`http://localhost:5000/api/dashboard/${currentUser._id}`);
+        const data = await response.json();
 
-      portfolio.forEach(item => {
-        const stock = allStocks.find(s => s.symbol === item.symbol);
-        if (stock) {
-          totalValue += stock.price * item.quantity;
-          invested += item.avgPrice * item.quantity;
+        if (response.ok) {
+          setPortfolioValue(Number(data.totalValue));
+          setTodayChange(Number(data.todaysReturns));
+          setActiveHoldingsCount(data.activeHoldings);
         }
-      });
-
-      setPortfolioValue(totalValue);
-      setTodayChange(totalValue - invested);
+      }
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error fetching dashboard data:", error);
     } finally {
       setLoading(false);
     }
@@ -105,7 +103,7 @@ export default function Dashboard() {
             sub={`(${((todayChange / portfolioValue) * 100 || 0).toFixed(2)}%)`}
             isPositive={todayChange >= 0}
           />
-          <SummaryCard title="Active Holdings" value={JSON.parse(localStorage.getItem("portfolio") || "[]").length} sub="Assets in your bag" />
+          <SummaryCard title="Active Holdings" value={activeHoldingsCount} sub="Assets in your bag" />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">

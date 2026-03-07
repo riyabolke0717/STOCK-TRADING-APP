@@ -103,7 +103,7 @@ export default function StockDetail() {
     setOrderLoading(true);
     try {
       const token = localStorage.getItem("authToken");
-      const endpoint = tradeType === "BUY" ? "/api/orders/buy" : "/api/orders/sell";
+      const endpoint = tradeType === "BUY" ? "/api/trade/buy" : "/api/trade/sell";
 
       const response = await fetch(`http://localhost:5000${endpoint}`, {
         method: "POST",
@@ -112,9 +112,10 @@ export default function StockDetail() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          stockSymbol: stock.symbol || symbol,
+          userId: currentUser._id,
           stockName: stock.name || symbol,
-          quantity: qty,
+          stockSymbol: stock.symbol || symbol,
+          quantity: Number(qty),
           price: stock.price,
         }),
       });
@@ -122,11 +123,10 @@ export default function StockDetail() {
       const result = await response.json();
 
       if (response.ok) {
-        // Update user balance & portfolio in localStorage
+        // Update user balance in localStorage
         const updatedUser = {
           ...currentUser,
           balance: result.newBalance,
-          portfolio: result.portfolio || currentUser.portfolio
         };
         localStorage.setItem("currentUser", JSON.stringify(updatedUser));
         setCurrentUser(updatedUser);

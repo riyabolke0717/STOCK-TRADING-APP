@@ -8,27 +8,31 @@ export default function Portfolio() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchHoldings = () => {
+    const fetchHoldings = async () => {
       const user = JSON.parse(localStorage.getItem("currentUser") || "{}");
-      if (user && user.portfolio) {
-        // Map backend schema keys 'avg_price' to local 'avgPrice' for mapping
-        const mappedPortfolio = user.portfolio.map(item => ({
-          ...item,
-          avgPrice: item.avg_price || item.avgPrice
-        }));
-        setPortfolio(mappedPortfolio);
-      } else {
-        setPortfolio([]);
+      if (user && user._id) {
+        try {
+          const response = await fetch(`http://localhost:5000/api/trade/holdings/${user._id}`);
+          const data = await response.json();
+          if (response.ok) {
+            // Map backend schema to what Portfolio expects
+            const mappedHoldings = data.map(h => ({
+              symbol: h.stockSymbol,
+              name: h.stockName,
+              quantity: h.quantity,
+              avgPrice: h.avgPrice
+            }));
+            setPortfolio(mappedHoldings);
+          }
+        } catch (error) {
+          console.error("Error fetching holdings:", error);
+        }
       }
     };
 
     fetchHoldings();
-
-    // Listen to changes (e.g., if a purchase happened in another tab)
     window.addEventListener('authChange', fetchHoldings);
-
     fetchStocks();
-
     return () => window.removeEventListener('authChange', fetchHoldings);
   }, []);
 

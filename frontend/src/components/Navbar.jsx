@@ -289,6 +289,7 @@ export default function Navbar({ authState, setAuthState }) {
                           { icon: "⭐", label: "Watchlist", to: "/watchlist" },
                           { icon: "💰", label: "Wallet", to: "/wallet" },
                           { icon: "👤", label: "Profile", to: "/profile" },
+                          ...(currentUser.role === "admin" ? [{ icon: "🛡️", label: "Admin Panel", to: "/admin" }] : []),
                         ].map((item) => (
                           <Link
                             key={item.label}

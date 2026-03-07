@@ -41,6 +41,7 @@ import Calculator from "./pages/Calculator";
 import Resources from "./pages/Resources";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import AdminDashboard from "./pages/AdminDashboard";
 
 // Protected Route Component - Persists login after refresh
 const ProtectedRoute = ({ children }) => {
@@ -137,7 +138,7 @@ const router = createBrowserRouter(
           ),
         },
         {
-          path: "/reset-password",
+          path: "/reset-password/:token",
           element: (
             <PublicRoute>
               <ResetPassword />
@@ -185,6 +186,14 @@ const router = createBrowserRouter(
           element: (
             <ProtectedRoute>
               <Wallet />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/admin",
+          element: (
+            <ProtectedRoute>
+              <AdminDashboard />
             </ProtectedRoute>
           ),
         },

@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 
@@ -7,9 +7,8 @@ export default function ResetPassword() {
     const { register, handleSubmit, watch, formState: { errors } } = useForm();
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
-    const [searchParams] = useSearchParams();
+    const { token } = useParams();
     const navigate = useNavigate();
-    const token = searchParams.get("token");
 
     useEffect(() => {
         if (!token) {
@@ -21,13 +20,12 @@ export default function ResetPassword() {
     const onSubmit = async (data) => {
         setIsLoading(true);
         try {
-            const response = await fetch("http://localhost:5000/api/auth/reset-password", {
+            const response = await fetch(`http://localhost:5000/api/auth/reset-password/${token}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    token,
                     newPassword: data.password,
                 }),
             });

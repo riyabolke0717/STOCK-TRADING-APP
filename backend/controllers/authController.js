@@ -2,7 +2,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const User = require("../models/User");
-const { sendResetEmail } = require("../services/emailService");
+const { sendResetEmail } = require("../utils/sendEmail");
 
 const generateToken = (id, role) => {
     return jwt.sign({ id, role }, process.env.JWT_SECRET || "SECRETKEY", {
@@ -110,7 +110,8 @@ const forgotPassword = async (req, res) => {
         // Generate reset token
         const resetToken = crypto.randomBytes(32).toString("hex");
         user.resetPasswordToken = crypto.createHash("sha256").update(resetToken).digest("hex");
-        user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+        user.resetPasswordExpire = Date.now() + 3600000; // 1 hour
+        user.lastResetRequest = Date.now();
 
         await user.save();
 
@@ -128,7 +129,8 @@ const forgotPassword = async (req, res) => {
 // @access  Public
 const resetPassword = async (req, res) => {
     try {
-        const { token, newPassword } = req.body;
+        const { newPassword } = req.body;
+        const token = req.params.token || req.body.token;
 
         if (!token || !newPassword) {
             return res.status(400).json({ message: "Invalid token or password" });
@@ -139,7 +141,7 @@ const resetPassword = async (req, res) => {
 
         const user = await User.findOne({
             resetPasswordToken: hashedToken,
-            resetPasswordExpires: { $gt: Date.now() },
+            resetPasswordExpire: { $gt: Date.now() },
         });
 
         if (!user) {
@@ -149,7 +151,7 @@ const resetPassword = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(newPassword, salt);
         user.resetPasswordToken = undefined;
-        user.resetPasswordExpires = undefined;
+        user.resetPasswordExpire = undefined;
 
         await user.save();
 

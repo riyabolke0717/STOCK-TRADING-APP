@@ -35,6 +35,8 @@ app.use("/api/orders", require("./routes/orderRoutes"));
 app.use("/api/market", require("./routes/marketRoutes"));
 app.use("/api/admin", require("./routes/adminRoutes"));
 app.use("/api/wallet", require("./routes/walletRoutes"));
+app.use("/api/trade", require("./routes/tradeRoutes"));
+app.use("/api/dashboard", require("./routes/dashboardRoutes"));
 
 // Global Error Handler
 app.use((err, req, res, next) => {

@@ -14,6 +14,6 @@ router.use(protect, admin);
 router.get("/users", getAllUsers);
 router.get("/users/:id", getUserById);
 router.delete("/users/:id", deleteUser);
-router.put("/users/:id/block", blockUser);
+router.put("/block-user/:id", blockUser);
 
 module.exports = router;

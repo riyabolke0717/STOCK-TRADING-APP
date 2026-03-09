@@ -118,7 +118,7 @@ Mobile responsive UI
 AI-based stock predictions
 👨‍💻 Author
 
-Developed by Riya bolke
+Developed by Riya bolke , Shubham More , Pranav Patil , Akansha Kumbhar 
 
 ⭐ Support
 

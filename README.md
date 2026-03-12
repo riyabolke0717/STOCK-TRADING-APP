@@ -66,7 +66,7 @@ stock-trading-app │ ├── backend │ ├── models │ ├── route
 
 1️⃣ Clone the repository
 
-git clone https://github.com/YOUR_USERNAME/stock-trading-app.git
+git clone https://github.com/riyabolke0717/stock-trading-app.git
 
 2️⃣ Navigate to project folder
 
